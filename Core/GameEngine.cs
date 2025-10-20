@@ -1,4 +1,4 @@
-namespace TripsTrapsTrull.Core;
+﻿namespace TripsTrapsTrull.Core;
 
 public enum CellState { Empty, X, O }
 public enum Player { X, O }
@@ -30,22 +30,24 @@ public class GameEngine
         if (IsGameOver) return false;
         if (Board[r, c] != CellState.Empty) return false;
 
-        Board[r, c] = (CurrentPlayer == Player.X) ? CellState.X : CellState.O;
+        var symbol = (CurrentPlayer == Player.X) ? CellState.X : CellState.O;
+        Board[r, c] = symbol;
 
         if (CheckWin(r, c))
         {
-            Winner = Board[r, c];
+            Winner = symbol;
             IsGameOver = true;
-            return true;
         }
-        if (IsFull())
+        else if (IsFull())
         {
-            Winner = CellState.Empty;
+            Winner = CellState.Empty; // ничья
             IsGameOver = true;
-            return true;
+        }
+        else
+        {
+            CurrentPlayer = (CurrentPlayer == Player.X) ? Player.O : Player.X;
         }
 
-        CurrentPlayer = (CurrentPlayer == Player.X) ? Player.O : Player.X;
         return true;
     }
 
@@ -57,31 +59,41 @@ public class GameEngine
         return true;
     }
 
-    bool CheckWin(int lastR, int lastC)
+    bool CheckWin(int r, int c)
     {
-        var me = Board[lastR, lastC];
+        var me = Board[r, c];
         if (me == CellState.Empty) return false;
 
+        // ряд
         bool rowOk = true;
-        for (int c = 0; c < Size; c++)
-            if (Board[lastR, c] != me) { rowOk = false; break; }
+        for (int j = 0; j < Size; j++)
+            if (Board[r, j] != me) { rowOk = false; break; }
+        if (rowOk) return true;
 
+        // колонка
         bool colOk = true;
-        for (int r = 0; r < Size; r++)
-            if (Board[r, lastC] != me) { colOk = false; break; }
+        for (int i = 0; i < Size; i++)
+            if (Board[i, c] != me) { colOk = false; break; }
+        if (colOk) return true;
 
-        bool d1Ok = true;
-        if (lastR == lastC)
+        // главная диагональ
+        if (r == c)
+        {
+            bool d1Ok = true;
             for (int i = 0; i < Size; i++)
                 if (Board[i, i] != me) { d1Ok = false; break; }
-                else d1Ok = false;
+            if (d1Ok) return true;
+        }
 
-        bool d2Ok = true;
-        if (lastR + lastC == Size - 1)
+        // побочная диагональ
+        if (r + c == Size - 1)
+        {
+            bool d2Ok = true;
             for (int i = 0; i < Size; i++)
                 if (Board[i, Size - 1 - i] != me) { d2Ok = false; break; }
-                else d2Ok = false;
+            if (d2Ok) return true;
+        }
 
-        return rowOk || colOk || d1Ok || d2Ok;
+        return false;
     }
 }
