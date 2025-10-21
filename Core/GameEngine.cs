@@ -3,7 +3,7 @@
 public enum CellState { Empty, X, O }
 public enum Player { X, O }
 
-public class GameEngine
+public class GameEngine // логика игры
 {
     public int Size { get; }
     public CellState[,] Board { get; }
@@ -11,13 +11,13 @@ public class GameEngine
     public bool IsGameOver { get; private set; }
     public CellState Winner { get; private set; } = CellState.Empty;
 
-    public GameEngine(int size = 3)
+    public GameEngine(int size = 3) // размер доски size x size
     {
         Size = size;
         Board = new CellState[size, size];
     }
 
-    public void Reset(Player? first = null)
+    public void Reset(Player? first = null) // сброс игры
     {
         Array.Clear(Board, 0, Board.Length);
         Winner = CellState.Empty;
@@ -25,7 +25,7 @@ public class GameEngine
         CurrentPlayer = first ?? Player.X;
     }
 
-    public bool MakeMove(int r, int c)
+    public bool MakeMove(int r, int c) // выйгрыш или ничья
     {
         if (IsGameOver) return false;
         if (Board[r, c] != CellState.Empty) return false;
@@ -51,7 +51,7 @@ public class GameEngine
         return true;
     }
 
-    bool IsFull()
+    bool IsFull() // проверка на заполненность доски
     {
         for (int r = 0; r < Size; r++)
             for (int c = 0; c < Size; c++)
@@ -59,7 +59,7 @@ public class GameEngine
         return true;
     }
 
-    bool CheckWin(int r, int c)
+    bool CheckWin(int r, int c) // проверка на выйгрыш
     {
         var me = Board[r, c];
         if (me == CellState.Empty) return false;
